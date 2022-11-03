@@ -6,10 +6,9 @@ def get_rows_of_data():
     return data.split("\n")
 
 def double_teg(row,spaces):
-    teg_name = row[row.find("<")+1:row.find(" ")]
+    teg_name = row[row.find("<")+1:row.find(">")]
     row_between_tegs= row[row.find(">")+1:row.rfind("<")].strip()
     row_with_ravno = row[row.find(" ")+1:row.find(">")]
-    print(row_between_tegs,row_with_ravno)
     return convert_sms(row_with_ravno, spaces, teg_name, row_between_tegs)
 
 def solo_teg(row,spaces):
@@ -18,10 +17,9 @@ def solo_teg(row,spaces):
     return convert_sms(row,spaces,teg_name)
 
 def double_no_last_teg(row,spaces):
-    teg_name = row[row.find("<") + 1:row.find(" ")]
+    teg_name = row[row.find("<") + 1:row.find(">")]
     row_between_tegs = row[row.find(">") + 1:].strip()
-    row_with_ravno = row[row.find(" ") + 1:row.find(">")]
-    print(row_between_tegs, row_with_ravno)
+    row_with_ravno = row[row.find(" ") + 1:row.find(">")] if " " in row else ""
     return convert_sms(row_with_ravno, spaces, teg_name, row_between_tegs)
 
 def solo_no_last_teg(row,spaces):
@@ -31,7 +29,7 @@ def solo_no_last_teg(row,spaces):
 
 def convert_sms(row, spaces, teg_name = "", dop_param = "", flag = True):
     li, tegli = [], []
-    if dop_param:
+    if dop_param!= "":
         tegli.append(" "*spaces+teg_name+": "+dop_param)
         teg_name = ""
     first_flag = " -" if flag else "  "
@@ -89,6 +87,9 @@ def parse(data):
     spaces = 0
     for row in data:
         result, spaces = parse_row(row,result,spaces)
+    test = result[0]
+    if "<" in test:
+        result.pop(0)
     with open(output_file, "w",encoding="utf-16") as f:
         f.write("\n".join(result))
 
@@ -96,5 +97,4 @@ def main():
     data = get_rows_of_data()
     parse(data)
 
-if __name__ == "__main__":
-    main()
+main()
